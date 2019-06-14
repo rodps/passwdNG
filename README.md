@@ -1,0 +1,2 @@
+# passwdNG
+passwd New Generation

@@ -1,8 +1,7 @@
 import sys
 import crypt, string, random
-from enum import Enum
 
-class Options(Enum):
+class Options():
     USER = 0
     PASSWORD = 1
     LAST_ALTERATION = 2

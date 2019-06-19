@@ -1,65 +1,78 @@
 import sys
 import crypt, string, random
+from enum import Enum
 
+class Options(Enum):
+    USER = 0
+    PASSWORD = 1
+    LAST_ALTERATION = 2
+    DAYS_TO_ALTERATE = 3
+    DAYS_TO_EXPIRATE = 4
+    DAYS_TO_DISABLE = 5
+    DAYS_OF_DISABLE = 6
+    RESERVED = 7
+    
 class Shadow():
 
     def __init__(self, lines: list):
         self.users = []
         for line in lines:
             info = line.split(':')
-            self.users.append({
-                'user': info[0],
-                'password': info[1],
-                'last_alteration': info[2],
-                'days_to_alterate': info[3],
-                'days_to_expirate': info[4],
-                'days_to_disable': info[5],
-                'days_of_disable': info[6],
-                'reserved': info[7]
-            })
+            self.users.append(info)
+    
+    def get_user(self, username):
+        for user in self.users:
+            if user[Options.USER] == username:
+                return user    
     
     def add_password(self, username: str, password: str):
-        pass_crypt = crypt.crypt(password, crypt.METHOD_SHA512)
-        user = get_user(username)
+        pass_crypt = crypt.crypt(password, crypt._Method('SHA512', '6', 8, 106))
+        user = self.get_user(username)
         if user:
-            user['password'] = pass_crypt
+            user[Options.PASSWORD] = pass_crypt
             return user
         print('User doesnt exists')
     
     def remove_password(self, username: str):
-        user = get_user(username)
+        user = self.get_user(username)
         if user:
-            user['password'] = '*'
+            user[Options.PASSWORD] = '*'
             return user
         print('User doesnt exists')
     
     def lock(self, username: str):
-        user = get_user(username)
+        user = self.get_user(username)
         if user:
-            user['password'] = '!' + user['password']
+            if user[Options.PASSWORD][0] == '!':
+                print('This user is already locked.')
+            else:
+                user[Options.PASSWORD] = '!' + user[Options.PASSWORD]
             return user
         print('User doesnt exists')
 
     def unlock(self, username: str):
-        user = get_user(username)
+        user = self.get_user(username)
         if user:
-            user['password'] = '!' + user['password']
+            if user[Options.PASSWORD][0] == '!':
+                user[Options.PASSWORD] = user[Options.PASSWORD][1:]
+            else:
+                print('This user is not locked.')
             return user
         print('User doesnt exists')
 
     def get_shadow(self):
         shadow = []
         for user in self.users:
-            shadow.append(':'.join(list(user.values())))
-        return shadow
-
-    def get_user(self, username):
-        for user in self.users:
-            if user['user'] == username:
-                return user        
-
-# def make_salt8():
-#     return '$6$'+''.join(random.choice(string.ascii_letters + string.digits + '.' + '/') for _ in range(8))
+            shadow.append(':'.join(user))
+            print(shadow)
+        return shadow    
 
 shadow = open('etc/shadow', 'r')
 s = Shadow(shadow.readlines())
+shadow.close()
+
+s.add_password('mysql', '123mud')
+
+shadow = open('etc/shadow', 'w')
+shadow.writelines(s.get_shadow())
+shadow.close()

@@ -1,20 +1,22 @@
 import sys
-import crypt, string, random
+import crypt
+from recomendation import Recomendation
 
-class Options():
+class Options:
     USER = 0
     PASSWORD = 1
     LAST_ALTERATION = 2
     DAYS_TO_ALTERATE = 3
     DAYS_TO_EXPIRATE = 4
     DAYS_TO_DISABLE = 5
-    DAYS_OF_DISABLE = 6
+    DAYS_DISABLED = 6
     RESERVED = 7
     
-class Shadow():
+class Shadow:
 
-    def __init__(self, lines: list):
+    def __init__(self, lines: list, recomendation: Recomendation):
         self.users = []
+        self.recomendation = recomendation
         for line in lines:
             info = line.split(':')
             self.users.append(info)
@@ -25,12 +27,15 @@ class Shadow():
                 return user    
     
     def add_password(self, username: str, password: str):
-        pass_crypt = crypt.crypt(password, crypt._Method('SHA512', '6', 8, 106))
         user = self.get_user(username)
-        if user:
+        if not user:
+            print('User doesnt exists')
+            return
+
+        if self.recomendation.test_password(password):
+            pass_crypt = crypt.crypt(password, crypt._Method('SHA512', '6', 8, 106))
             user[Options.PASSWORD] = pass_crypt
             return user
-        print('User doesnt exists')
     
     def remove_password(self, username: str):
         user = self.get_user(username)
@@ -63,14 +68,14 @@ class Shadow():
         shadow = []
         for user in self.users:
             shadow.append(':'.join(user))
-            print(shadow)
         return shadow    
 
 shadow = open('etc/shadow', 'r')
-s = Shadow(shadow.readlines())
+rec = Recomendation(1,1,1,1,8)
+s = Shadow(shadow.readlines(), rec)
 shadow.close()
 
-s.add_password('mysql', '123mud')
+s.add_password('rodrigo', '123muD/')
 
 shadow = open('etc/shadow', 'w')
 shadow.writelines(s.get_shadow())

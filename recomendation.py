@@ -3,8 +3,8 @@ import string
 class Recomendation:
 
     def __init__(self,
-                 uppercase: int, lowercase: int, numbers: int,
-                 special: int, total: int, repetition=True):
+                 uppercase=0, lowercase=0, numbers=0,
+                 special=0, total=0, repetition=True):
         """
         uppercase: minimum number of uppercase letters\n
         lowecase: minimum number of lowercase letters\n
@@ -49,4 +49,11 @@ class Recomendation:
             print('Special characters lower than recomended. Minimum {}, you have {}.'
                   .format(self.special, count_special))
             return False
+        return True
+    
+    def check_dict_password(self, dict, password):
+        for word in dict:
+            if word == password:
+                print('Weak Password: Dictionary password ->' + word)
+                return False
         return True

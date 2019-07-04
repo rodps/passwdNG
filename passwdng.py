@@ -1,82 +1,62 @@
-import sys
-import crypt
+from shadow import Shadow
 from recomendation import Recomendation
 
-class Options:
-    USER = 0
-    PASSWORD = 1
-    LAST_ALTERATION = 2
-    DAYS_TO_ALTERATE = 3
-    DAYS_TO_EXPIRATE = 4
-    DAYS_TO_DISABLE = 5
-    DAYS_DISABLED = 6
-    RESERVED = 7
-    
-class Shadow:
+if __name__ == "__main__":
 
-    def __init__(self, lines: list, recomendation: Recomendation):
-        self.users = []
-        self.recomendation = recomendation
-        for line in lines:
-            info = line.split(':')
-            self.users.append(info)
-    
-    def get_user(self, username):
-        for user in self.users:
-            if user[Options.USER] == username:
-                return user    
-    
-    def add_password(self, username: str, password: str):
-        user = self.get_user(username)
-        if not user:
-            print('User doesnt exists')
-            return
+    recomendation = Recomendation()
+    shadow = Shadow("etc/shadow", recomendation)
 
-        if self.recomendation.test_password(password):
-            pass_crypt = crypt.crypt(password, crypt._Method('SHA512', '6', 8, 106))
-            user[Options.PASSWORD] = pass_crypt
-            return user
-    
-    def remove_password(self, username: str):
-        user = self.get_user(username)
-        if user:
-            user[Options.PASSWORD] = '*'
-            return user
-        print('User doesnt exists')
-    
-    def lock(self, username: str):
-        user = self.get_user(username)
-        if user:
-            if user[Options.PASSWORD][0] == '!':
-                print('This user is already locked.')
-            else:
-                user[Options.PASSWORD] = '!' + user[Options.PASSWORD]
-            return user
-        print('User doesnt exists')
-
-    def unlock(self, username: str):
-        user = self.get_user(username)
-        if user:
-            if user[Options.PASSWORD][0] == '!':
-                user[Options.PASSWORD] = user[Options.PASSWORD][1:]
-            else:
-                print('This user is not locked.')
-            return user
-        print('User doesnt exists')
-
-    def get_shadow(self):
-        shadow = []
-        for user in self.users:
-            shadow.append(':'.join(user))
-        return shadow    
-
-shadow = open('etc/shadow', 'r')
-rec = Recomendation(1,1,1,1,8)
-s = Shadow(shadow.readlines(), rec)
-shadow.close()
-
-s.add_password('rodrigo', '123muD/')
-
-shadow = open('etc/shadow', 'w')
-shadow.writelines(s.get_shadow())
-shadow.close()
+    print("*********************************")
+    print("***** Passwd New Generation *****")
+    print("*********************************")
+    while True:
+        cmd = input().split(" ")
+        if cmd[0] == "config":
+            if cmd[1] == "uppercase":
+                recomendation.uppercase = int(cmd[2])
+                print("Minimun uppercase characters changed to " + cmd[2])
+            if cmd[1] == "lowercase":
+                recomendation.lowercase = int(cmd[2])
+                print("Minimun lowercase characters changed to " + cmd[2])
+            if cmd[1] == "number":
+                recomendation.numbers = int(cmd[2])
+                print("Minimun number characters changed to " + cmd[2])
+            if cmd[1] == "number":
+                recomendation.numbers = int(cmd[2])
+                print("Minimun number characters changed to " + cmd[2])
+            if cmd[1] == "special":
+                recomendation.special = int(cmd[2])
+                print("Minimun special characters changed to " + cmd[2])
+            if cmd[1] == "total":
+                recomendation.total = int(cmd[2])
+                print("Total characters changed to " + cmd[2])
+            if cmd[1] == "repeat":
+                if cmd[2] == "y":
+                    recomendation.repeat = True
+                    print("Allowed to repeat password")
+                elif cmd[2] == "n":
+                    recomendation.repeat = False
+                    print("Not allowed to repeat password")
+                else:
+                    print("Error: Unknown command.")
+                    continue
+        elif cmd[0] == "addpassword":
+            if shadow.add_password(cmd[1], cmd[2]):
+                print("Password added succesful")
+                shadow.save()
+        elif cmd[0] == "rempassword":
+            if shadow.remove_password(cmd[1]):
+                print("Password removed succesful")
+                shadow.save()
+        elif cmd[0] == "lock":
+            if shadow.lock(cmd[1]):
+                print("Password locked succesful")
+                shadow.save()
+        elif cmd[0] == "unlock":
+            if shadow.unlock(cmd[1]):
+                print("Password unlocked succesful")
+                shadow.save()
+        elif cmd[0] == "exit":
+            break
+        else:
+            print("Error: Unknown command.")

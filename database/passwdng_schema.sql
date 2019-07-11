@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(32) NOT NULL,
+    created_at DATE
+);
+
+CREATE TABLE IF NOT EXISTS passwords (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    pass VARCHAR(90) NOT NULL,
+    created_at DATE,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);

@@ -20,8 +20,7 @@ class Shadow:
         self.recomendation = recomendation
         with open(path, 'r') as shadow:
             for line in shadow.readlines():
-                info = line.split(':')
-                self.users.append(info)
+                self.users.append(line.split(':'))
     
     def get_user(self, username):
         for user in self.users:
@@ -31,22 +30,22 @@ class Shadow:
     def add_password(self, username: str, password: str):
         user = self.get_user(username)
         if not user:
-            print('User doesnt exists')
+            print("User does not exists")
             return
         
         dict = open('dict.txt', 'r')
+        pass_level = self.recomendation.test_password(password)
 
-        if (self.recomendation.test_password(password) and
-        self.recomendation.check_dict_password(dict, password)):
+        if (pass_level and self.recomendation.check_dict_password(dict, password)):
             pass_crypt = crypt.crypt(password, crypt._Method('SHA512', '6', 8, 106))
             user[Options.PASSWORD] = pass_crypt
-            return user
+            return (username, pass_crypt, pass_level)
     
     def remove_password(self, username: str):
         user = self.get_user(username)
         if user:
             user[Options.PASSWORD] = '*'
-            return user
+            return True
         print('User doesnt exists')
     
     def lock(self, username: str):

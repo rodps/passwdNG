@@ -4,7 +4,7 @@ class Recomendation:
 
     def __init__(self,
                  uppercase=0, lowercase=0, numbers=0,
-                 special=0, total=0, repetition=True):
+                 special=0, total=0, repeat=True):
         """
         uppercase: minimum number of uppercase letters\n
         lowecase: minimum number of lowercase letters\n
@@ -17,13 +17,14 @@ class Recomendation:
         self.numbers = numbers
         self.special = special
         self.total = total
-        self.repetition = repetition
+        self.repeat = repeat
     
     def test_password(self, password: str) -> bool:
         count_lower = 0
         count_upper = 0
         count_number = 0
         count_special = 0
+        level = 0
         for c in password:
             if c in string.ascii_uppercase:
                 count_upper += 1
@@ -33,6 +34,7 @@ class Recomendation:
                 count_number += 1
             if c in string.punctuation:
                 count_special += 1
+
         if count_upper < self.uppercase:
             print('Uppercase characters lower than recomended. Minimum {}, you have {}.'
                   .format(self.uppercase, count_upper))
@@ -49,7 +51,13 @@ class Recomendation:
             print('Special characters lower than recomended. Minimum {}, you have {}.'
                   .format(self.special, count_special))
             return False
-        return True
+        
+        if len(password) > 9 and count_special and count_number and count_upper:
+            return "Strong"
+        if len(password) > 9 and (count_special or count_number or count_upper):
+            return "Medium"
+        else:
+            return "Weak"
     
     def check_dict_password(self, dict, password):
         for word in dict:

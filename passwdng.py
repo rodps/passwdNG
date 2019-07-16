@@ -5,6 +5,10 @@ from recomendation import Recomendation
 from users import User, Users
 from texttable import Texttable
 
+"""
+Main interface of the program.
+"""
+
 if __name__ == "__main__":
 
     recomendation = Recomendation()
@@ -96,8 +100,6 @@ if __name__ == "__main__":
         elif cmd[0] == 'help':
             table = Texttable()
             table.set_deco(Texttable.HEADER)
-            # table.set_cols_align(['r', 'l'])
-            # table.set_cols_width([40, 50])
             if len(cmd) > 1:
                 if cmd[1] == 'config':
                     table.add_rows([

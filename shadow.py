@@ -13,6 +13,10 @@ class Options:
     RESERVED = 7
     
 class Shadow:
+    
+    '''
+    This class manipulates the shadow file
+    '''
 
     def __init__(self, path: str, recomendation: Recomendation):
         self.path = path

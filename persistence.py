@@ -2,6 +2,9 @@ import sqlite3
 import datetime
 
 class Persistence():
+    """
+    this class is responsible for saving and retrieving data in the database.
+    """
     
     def __init__(self):
         self.conn = sqlite3.connect('./database/passwdng.db')

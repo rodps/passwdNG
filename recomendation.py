@@ -6,11 +6,12 @@ class Recomendation:
                  uppercase=0, lowercase=0, numbers=0,
                  special=0, total=0, repeat=True):
         """
+        This class offers a password recomendation.\n
         uppercase: minimum number of uppercase letters\n
         lowecase: minimum number of lowercase letters\n
         numbers: minimum number of numbers\n
         special: minimum number of special characters\n
-        total: maximum size
+        total: maximum length
         """
         self.uppercase = uppercase
         self.lowercase = lowercase
@@ -19,7 +20,12 @@ class Recomendation:
         self.total = total
         self.repeat = repeat
     
-    def test_password(self, password: str) -> bool:
+    def test_password(self, password: str) -> str:
+        """
+        Tests if the password respect the configuration
+        and return a level for the password.\n
+        Levels: Strong, Medium, Weak.
+        """
         count_lower = 0
         count_upper = 0
         count_number = 0
@@ -59,7 +65,10 @@ class Recomendation:
         else:
             return "Weak"
     
-    def check_dict_password(self, dict, password):
+    def check_dict_password(self, dict: list, password: str) -> bool:
+        """
+        Check if the dictionary contains the password.
+        """
         for word in dict:
             if word == password:
                 print('Weak Password: Dictionary password ->' + word)

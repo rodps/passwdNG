@@ -13,6 +13,10 @@ class User:
 
 class Users:
     
+    '''
+    This class represents a list of users in passwd file.
+    '''
+
     def __init__(self, passwd_path: str):
         self.users = []
         with open(passwd_path) as passwd_file:

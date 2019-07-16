@@ -57,6 +57,7 @@ class Shadow:
         if user:
             if user[Options.PASSWORD][0] == '!':
                 print('This user is already locked.')
+                return False
             else:
                 user[Options.PASSWORD] = '!' + user[Options.PASSWORD]
             return user
@@ -69,6 +70,7 @@ class Shadow:
                 user[Options.PASSWORD] = user[Options.PASSWORD][1:]
             else:
                 print('This user is not locked.')
+                return False
             return user
         print('User doesnt exists')
 

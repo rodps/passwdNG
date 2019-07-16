@@ -11,13 +11,15 @@ class Persistence():
         self.cursor = self.conn.cursor()
         with open('./database/passwdng_schema.sql') as db_schema:
             self.cursor.executescript(db_schema.read())
+        if self.get_conf() == None:
+            self.add_conf(0,0,0,0,0,0)
 
-    def add_password(self, username, password, pass_level):
+    def add_password(self, username, password, pass_level, status='Unlocked'):
         now = datetime.datetime.now()
         self.cursor.execute('''
-            INSERT INTO passwords(username, pass, pass_level, created_at)
-            values("{}", "{}", "{}", "{}")
-            '''.format(username, password, pass_level, now.strftime("%Y-%m-%d %H:%M")))
+            INSERT INTO passwords(username, pass, pass_level, status, created_at)
+            values("{}", "{}", "{}", "{}", "{}")
+            '''.format(username, password, pass_level, status, now.strftime("%Y-%m-%d %H:%M")))
         self.conn.commit()
 
     def get_password(self, username=None):
@@ -36,8 +38,9 @@ class Persistence():
     
     def get_password_groupbyname(self):
         self.cursor.execute('''
-            SELECT MAX(id), username, pass, pass_level, created_at
+            SELECT MAX(id), username, pass, pass_level, status, created_at
             FROM passwords
+            GROUP BY username
             ''')
         return self.cursor.fetchall()
 
@@ -51,16 +54,16 @@ class Persistence():
     def add_conf(self, uppercase, lowercase, numbers, special, total, period):
         now = datetime.datetime.now()
         self.cursor.execute('''
-            INSERT INTO conf
+            INSERT INTO conf (uppercase, lowercase, numbers, special, total, period, created_at)
             values("{}", "{}", "{}", "{}", "{}", "{}", "{}")
             '''.format(uppercase, lowercase, numbers, special, total, period,
                         now.strftime("%Y-%m-%d %H:%M")))
-        conn.commit()
+        self.conn.commit()
 
     def get_conf(self, all=False):
         if not all:
             self.cursor.execute('''
-                SELECT
+                SELECT *
                 FROM conf
                 WHERE id=(
                     SELECT MAX(id)
